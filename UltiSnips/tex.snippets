@@ -348,6 +348,21 @@ $0
 \end{document}
 endsnippet
 
+snippet %! "tex program" bi
+%!TeX program = xelatex % or  pdflatex lualatex
+endsnippet
+
+snippet pdflatex "tex program" bi
+%!TeX program = pdflatex
+endsnippet
+
+snippet xelatex "tex program" bi
+%!TeX program = xelatex
+endsnippet
+
+snippet lualatex "tex program" bi
+%!TeX program = lualatex
+endsnippet
 
 snippet table "Table environment" b
 \begin{table}[${1:htpb}]
@@ -527,6 +542,9 @@ $0
 \end{frame}
 endsnippet
 
+snippet underline "underline" 
+\underline{${1:${VISUAL}}}
+endsnippet
 ######################
 ## correct typing
 ######################
