@@ -213,7 +213,7 @@ def findfirstoperator(line):
 						continue
 				elif depth <= 0 and line[index] == '=':
 						return index
-				elif depth <= 0 and all(line[index:].startswith(x) for x in ["\\le", "\\ge", ">", "<", "\\succ", "\\prec", "\\sim", "\\ne", "\\not"]):
+				elif depth <= 0 and any(line[index:].startswith(x) for x in ["\\le", "\\ge", ">", "<", "\\succ", "\\prec", "\\sim", "\\ne", "\\not"]):
 						return index
 				else:
 						index += 1
@@ -360,7 +360,7 @@ ${1:`!p
 selectedcode = [x for x in snip.v.text.split("\n") if x]
 for (i, x) in enumerate(selectedcode):
 		index = findfirstoperator(x)
-		snip.rv += ("" if i == 0 else "    ") + x[:index] + "&" + x[index:] + "\\\\" + ("" if i == len(selectedcode) - 1 else "\n")
+		snip.rv += ("" if i == 0 else "    ") + x[:index] + "&" + x[index:] + r"\\" + ("" if i == len(selectedcode) - 1 else "\n")
 `}
 \end{aligned}
 endsnippet
@@ -507,12 +507,12 @@ endsnippet
 
 
 context "math()"
-snippet '([A-QS-Za-z])(\d)' "auto subscript" wrA
+snippet '([A-QS-Za-z])(\d)' "auto number subscript a1->a_1" wrA
 `!p snip.rv = match.group(1)`_`!p snip.rv = match.group(2)`
 endsnippet
 
 context "math()"
-snippet '([A-Za-z])_(\d\d)' "auto subscript2" wrA
+snippet '([A-Za-z])_(\d\d)' "auto double subscript a12->a_{12}" wrA
 `!p snip.rv = match.group(1)`_{`!p snip.rv = match.group(2)`}
 endsnippet
 
@@ -702,7 +702,7 @@ snippet lrB "left[ right]" iA
 endsnippet
 
 snippet lra "leftangle rightangle" iA
-\Braket{${1:${VISUAL}}}
+\left\langle ${1:${VISUAL}} , ${2}\right\rangle
 endsnippet
 
 context "math()"
@@ -940,33 +940,11 @@ snippet where "where" iA
 endsnippet
 
 ### Fast subscript
-context "math()"
-snippet xnn "xn" iA
-x_{n}
-endsnippet
-
-context "math()"
-snippet ynn "yn" iA
-y_{n}
-endsnippet
-
 
 priority 100
 context "math()"
-snippet "\b([a-zA-Z])ii" "?i" riA
-`!p snip.rv=match.group(1)`_{i}
-endsnippet
-
-priority 100
-context "math()"
-snippet "\b([a-zA-Z])nn" "?n" riA
-`!p snip.rv=match.group(1)`_{n}
-endsnippet
-
-priority 100
-context "math()"
-snippet "\b([a-zA-Z])jj" "?j" riA
-`!p snip.rv=match.group(1)`_{j}
+snippet "([a-hjtvw])([a-z])\2" "akk -> a_k subscript" riA
+`!p snip.rv=match.group(1) +"_"+match.group(2)[0]`
 endsnippet
 
 priority 101
@@ -992,7 +970,7 @@ endsnippet
 priority 2000
 context "math()"
 snippet "(?!=^\\)([a-zA-Z])([a-zA-Z])p(\d)" "x[n+1]" rA
-`!p snip.rv=match.group(1)`_{`!p snip.rv=match.group(2)`+`!p snip.rv=match.group(3)`}
+`!p snip.rv=match.group(1)`^{`!p snip.rv=match.group(2)`+`!p snip.rv=match.group(3)`}
 endsnippet
 
 context "math()"
@@ -1086,7 +1064,7 @@ endsnippet
 # See Section 5.1 of the document of amsmath https://texdoc.org/serve/amsmath/0
 priority 100
 context "math()"
-snippet '(?<!\\)(sin|cos|arccot|cot|csc|ln|log|exp|star|perp|geq|leq|quad|equiv|sup|inf|max|dim|ker|Pr|neq|det)' "ln" rwA
+snippet '(?<!\\)(sin|cos|arccot|cot|csc|ln|log|exp|star|perp|geq|leq|quad|equiv|sup|inf|max|dim|ker|Pr|neq|det|partial)' "ln" rwA
 \\`!p snip.rv = match.group(1)`
 endsnippet
 
@@ -1192,7 +1170,7 @@ endsnippet
 
 context "math()"
 snippet set "set" wA
-\Set{${1:${VISUAL}}}
+\\{${1:${VISUAL}}\\}
 endsnippet
 
 context "math()"
@@ -1369,7 +1347,7 @@ context "math()"
 snippet \minimize "Optimization problem" iA
 \begin{aligned}
 	\min \quad& ${1:f(x)}\\\\
-	\text{s.t.}\quad& ${2:g(x)} \leq 0\\\\
+	\mathrm{s.t.}\quad& ${2:g(x)} \leq 0\\\\
 				& ${3:h(x)} = 0\\\\
 \end{aligned}
 endsnippet
@@ -1548,7 +1526,7 @@ snippet opn "operatorname" A
 endsnippet
 
 context "math()"
-snippet "(\w*)opn" "operatorname" iwAr
+snippet "(\S*)opn" "operatorname" iwAr
 \operatorname{`!p snip.rv = match.group(1)`}
 endsnippet
 
@@ -1577,6 +1555,11 @@ endsnippet
 
 context "math()"
 snippet := ":=" iA
+\coloneqq 
+endsnippet
+
+context "math()"
+snippet =: "=:" iA
 \coloneqq 
 endsnippet
 
@@ -1640,6 +1623,17 @@ snip.rv = symbol_list[(index + 1) % len(symbol_list)]
 `
 endsnippet
 
+context "math()"
+snippet "\\right\)([_\^]){?(\w)}?" "mathclap supersubcript" wr
+`!p snip.rv=r"\right)"+match.group(1)+r"{\mathclap "+match.group(2)+"}"`
+endsnippet
+
+context "math()"
+snippet "\\right\)([\^_]){\\mathclap (\w)}" "revert mathclap supersubscript for better spacing" wr
+`!p snip.rv=r"\right)"+match.group(1)+match.group(2)`
+endsnippet
+
+
 # Space in latex
 # See https://www.overleaf.com/learn/latex/Spacing_in_math_mode#Reference_guide
 # \quad : space equal to the current font size (= 18 mu)
@@ -1700,18 +1694,36 @@ endsnippet
 
 
 context "math()"
-snippet "^.*(\\right\s*[\)\]]|\S(?<!\\right)\s*[\)\]])" "change type of parentheses: ( to \left(" wr
+snippet "^.*(\\right\s*[\)\]]|\S(?<!\\right)\s*[\)\]])" "change type of parentheses: ([ to \left([" wr
 `!p
 line = match.string
 left_parentheses = findmatched_parentheses(line, len(line) - 1)
-if match.group(1)[-1] == ")" and not re.fullmatch(r"\\right\s*\)", match.group(1)):
-	snip.rv += line[:left_parentheses] + "\\left(" + line[left_parentheses+1:-1] + "\\right)"
-elif match.group(1)[-1] == "]" and not re.fullmatch(r"\\right\s*\]", match.group(1)):
-	snip.rv += line[:left_parentheses] + "\\left[" + line[left_parentheses+1:-1] + "\\right]"
-elif match.group(1)[-1] == ")":
-	snip.rv += line[:left_parentheses].rstrip()[:-5] + "(" + line[left_parentheses+1:-1].rstrip()[:-6] + ")"
+parathesis = [")","]"]
+matched = {"(":")", ")":"(", "[":"]","]":"["}
+for para in parathesis:
+	if match.group(1)[-1] == para:
+		if not re.fullmatch(r"\\right\s*"+"\\" + para, match.group(1)):
+			snip.rv += line[:left_parentheses] + "\\left" + matched[para] + line[left_parentheses+1:-1] + "\\right" + para
+		else:
+			snip.rv += line[:left_parentheses].rstrip()[:-5] + matched[para] + line[left_parentheses+1:-1].rstrip()[:-6] + para
+		break
+`
+endsnippet
+
+context "math()"
+snippet "^.*(\\right\s*\\}|\S(?<!\\right)\s*\\})" "change type of \{ to \left\{" wr
+`!p
+line = match.string
+left_parentheses = findmatched_parentheses(line, len(line) - 1)
+# parathesis = [")","]"]
+matched = {"{":"}","}":"{"}
+para="}"
+if not re.fullmatch(r"\\right\s*" + "\\\\" + para, match.group(1)):
+	snip.rv += line[:left_parentheses] + "left\\" + matched[para] + line[left_parentheses+1:-1] + "right\\" + para
 else:
-	snip.rv += line[:left_parentheses].rstrip()[:-5] + "[" + line[left_parentheses+1:-1].rstrip()[:-6] + "]"
+	######  						# \left\{                                                     # \left\{ .... \right\}
+	######  						#  ^    ^                                                     #        ^      ^    ^
+	snip.rv += line[:left_parentheses].rstrip()[:-5] + matched[para] + line[left_parentheses+1:-1].rstrip()[:-6] +  para
 `
 endsnippet
 
