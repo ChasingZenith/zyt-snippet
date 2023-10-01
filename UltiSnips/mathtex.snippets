@@ -20,7 +20,7 @@ import re
 from snippet_helpers import last_p1_not_p2, first_p1_not_p2
 
 def math():
-	# return vim.eval('vimtex#syntax#in_mathzone()') != '0'
+	return vim.eval('mode#in_mathzone()') == '1'
 	if vim.eval('&filetype') == 'tex':
 		return vim.eval('vimtex#syntax#in_mathzone()') == '1'
 	elif vim.eval('&filetype') == 'markdown':
@@ -479,16 +479,22 @@ endsnippet
 
 
 context math()
-snippet · "unicode -> cdot" iA
+snippet · "unicode · -> cdot" iA
 \cdot
 endsnippet
 context math()
 snippet . "cdot" i
 \cdot
 endsnippet
+priority 102
+context math()
+snippet "(?<=[\(,])\." "cdot" ir
+\\,\\cdot\\,
+endsnippet
 ### END Smart dots
 
 
+priority 101
 context math()
 snippet => "implies" Ai
 \implies
@@ -743,7 +749,7 @@ snippet diff "d/dx" w
 endsnippet
 
 context "math()"
-snippet sq "\sqrt{}" iA
+snippet "(?<![\\a-zA-Z])sq" "\sqrt{}" iA
 \sqrt{${1:${VISUAL}}} $0
 endsnippet
 
@@ -1030,12 +1036,16 @@ endsnippet
 
 priority 100
 context "math()"
-snippet ** "star" iA
+snippet ** "superscript *" iA
 ^{*}
 endsnippet
 
 context "math()"
 snippet opt "optimal value - supersucript star" iA
+^{\star}
+endsnippet
+context "math()"
+snippet dual "conjugate dual" iA
 ^{*}
 endsnippet
 
@@ -1558,11 +1568,13 @@ snippet := ":=" iA
 \coloneqq 
 endsnippet
 
+priority 201
 context "math()"
 snippet =: "=:" iA
-\coloneqq 
+\eqqcolon 
 endsnippet
 
+priority 200
 context "math()"
 snippet iid "independent and identical distribution" iA
 \overset{\text{i.i.d.}}{\sim}

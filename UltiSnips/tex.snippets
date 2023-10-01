@@ -4,7 +4,8 @@ import re
 
 
 def math():
-	return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+	return vim.eval('mode#in_mathzone()') == '1'
+	# return vim.eval('vimtex#syntax#in_mathzone()') == '1'
 
 
 def environment(default_envname = None, lastemptyline = False):
@@ -426,7 +427,13 @@ snippet "([,\.]*)\\]\s*([,\.])" "Add ',' '.' for display math" rA
 `!p snip.rv=match.group(2)`\\]
 endsnippet
 
+snippet tikzexternal "tikzexternal" w
+\usepackage{tikz}
+\usetikzlibrary{external}
+\tikzexternalize[only named=true] % \tikzsetnextfilename{filename}
 
+\tikzsetexternalprefix{./tikz_external/}
+endsnippet
 
 snippet plot "Plot" w
 \begin{figure}[$1]
@@ -604,6 +611,19 @@ endsnippet
 context "not math()"
 snippet "(?<=\S)\s{2,}" "remove double spaces" iwrA
  
+endsnippet
+
+snippet 1st "1st " wA
+1\textsuperscript{st}
+endsnippet
+snippet 2nd "2nd " wA
+2\textsuperscript{nd}
+endsnippet
+snippet 3rd "3rd " wA
+3\textsuperscript{rd}
+endsnippet
+snippet "(\d+)th" "nth" rwA
+`!p snip.rv=match.group(1)`\textsuperscript{th}
 endsnippet
 
 # vim: ts=2 sw=2 noet:list:ft=snippets:
