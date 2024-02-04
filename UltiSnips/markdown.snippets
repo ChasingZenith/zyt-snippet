@@ -28,8 +28,12 @@ def back_parentheses():
 #     return True
 #   return False
 
+# def math():
+# 	return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+
 def math():
-	return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+    # "jasoneveleth/treesitter_latex_mathmode.nvim"
+	return vim.eval('mode#in_mathzone()') == '1'
 
 def vim_left_paragraph():
 	currentlinenumber = int(vim.eval("line('.')"))

@@ -3,9 +3,13 @@ global !p
 import re
 
 
+# def math():
+# 	# return vim.eval('mode#in_mathzone()') == '1'
+# 	return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+
 def math():
+	# "jasoneveleth/treesitter_latex_mathmode.nvim"
 	return vim.eval('mode#in_mathzone()') == '1'
-	# return vim.eval('vimtex#syntax#in_mathzone()') == '1'
 
 
 def environment(default_envname = None, lastemptyline = False):
@@ -414,10 +418,14 @@ snippet pac "Package" b
 endsnippet
 
 
-snippet dm "Math" wA
-\[
-	${1:${VISUAL}}
-\]
+priority 1
+snippet dm "Math" bA
+\[ ${1:${VISUAL}} \]
+endsnippet
+priority 0
+snippet dm "Math" wAm
+
+\[ ${1:${VISUAL}} \]
 endsnippet
 
 # add comma and period \]. -> .\] and \], -> ,\]
@@ -598,6 +606,11 @@ endsnippet
 snippet underline "underline" 
 \underline{${1:${VISUAL}}}
 endsnippet
+
+snippet '(red|blue|gray|yellow|orange)tt' "redtt \textcolor{color}{text}" rwA
+\\textcolor{`!p snip.rv = match.group(1)`}{${1:${VISUAL}}} $0
+endsnippet
+
 ######################
 ## correct typing
 ######################

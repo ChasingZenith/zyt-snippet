@@ -19,27 +19,30 @@ import re
 
 from snippet_helpers import last_p1_not_p2, first_p1_not_p2
 
-def math():
-	return vim.eval('mode#in_mathzone()') == '1'
-	if vim.eval('&filetype') == 'tex':
-		return vim.eval('vimtex#syntax#in_mathzone()') == '1'
-	elif vim.eval('&filetype') == 'markdown':
-		if vim_left_last_p1_not_p2(r"https://www.zhihu.com/equation\?tex=\" alt=\"", r"eeimg=\"") and vim_right_first_p1_not_p2(r"eeimg=\"", r"https://www.zhihu.com/equation\?tex=\" alt=\""):
-			return True
-		lp = vim_left_paragraph()
-		rp = vim_right_paragraph()
-		lp = " ".join(lp)
-		rp = " ".join(rp)
-		lp = re.sub(r"(?<!\\)(\\\\)*\\$", "", lp)
-		rp = re.sub(r"(?<!\\)(\\\\)*\\$", "", rp)
-		tlp = re.sub(r"(?<!\\)(\\\\)*$$", "", lp)
-		trp = re.sub(r"(?<!\\)(\\\\)*$$", "", rp)
-		if tlp.count("$") % 2 == 1 and "$" in trp:
-			return True
-		if last_p1_not_p2(lp, "$$", "$") and first_p1_not_p2(rp, "$$", "$") and tlp.count("$$") % 2 == 1:
-			return True
-		return False
+# def math():
+# 	# return vim.eval('mode#in_mathzone()') == '1'
+# 	if vim.eval('&filetype') == 'tex':
+# 		return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+# 	elif vim.eval('&filetype') == 'markdown':
+# 		if vim_left_last_p1_not_p2(r"https://www.zhihu.com/equation\?tex=\" alt=\"", r"eeimg=\"") and vim_right_first_p1_not_p2(r"eeimg=\"", r"https://www.zhihu.com/equation\?tex=\" alt=\""):
+# 			return True
+# 		lp = vim_left_paragraph()
+# 		rp = vim_right_paragraph()
+# 		lp = " ".join(lp)
+# 		rp = " ".join(rp)
+# 		lp = re.sub(r"(?<!\\)(\\\\)*\\$", "", lp)
+# 		rp = re.sub(r"(?<!\\)(\\\\)*\\$", "", rp)
+# 		tlp = re.sub(r"(?<!\\)(\\\\)*$$", "", lp)
+# 		trp = re.sub(r"(?<!\\)(\\\\)*$$", "", rp)
+# 		if tlp.count("$") % 2 == 1 and "$" in trp:
+# 			return True
+# 		if last_p1_not_p2(lp, "$$", "$") and first_p1_not_p2(rp, "$$", "$") and tlp.count("$$") % 2 == 1:
+# 			return True
+# 		return False
 
+def math():
+	# "jasoneveleth/treesitter_latex_mathmode.nvim"
+	return vim.eval('mode#in_mathzone()') == '1'
 
 # helper functions for math()
 def vim_left_paragraph():
@@ -949,9 +952,23 @@ endsnippet
 
 priority 100
 context "math()"
-snippet "([a-hjtvw])([a-z])\2" "akk -> a_k subscript" riA
-`!p snip.rv=match.group(1) +"_"+match.group(2)[0]`
+### Backreference is an expression \n where n is a number. It matches the contents of the n'th set of parentheses in the expression.
+snippet "([b-hjtuvwxyz])([a-z])\2" "akk -> a_k subscript" riA
+`!p snip.rv=match.group(1) + "_" + match.group(2)[0]`
 endsnippet
+
+# exclude \leftarrow \rightarrow
+priority 100
+context "math()"
+### Backreference is an expression \n where n is a number. It matches the contents of the n'th set of parentheses in the expression.
+snippet "a([a-qs-z])\1" "akk -> a_k subscript" riA
+`!p snip.rv= "a" + "_" + match.group(1)[0]`
+endsnippet
+context "math()"
+snippet "([^t])arr" "akk -> a_k subscript" rwA
+`!p snip.rv=match.group(1) + "a" +"_" + "r"`
+endsnippet
+# exclude \leftarrow \rightarrow END
 
 priority 101
 context "math()"
@@ -1355,11 +1372,11 @@ endsnippet
 
 context "math()"
 snippet \minimize "Optimization problem" iA
-\begin{aligned}
-	\min \quad& ${1:f(x)}\\\\
-	\mathrm{s.t.}\quad& ${2:g(x)} \leq 0\\\\
-				& ${3:h(x)} = 0\\\\
-\end{aligned}
+\begin{array}{cl}
+	\displaystyle\min \quad	& ${1:f(x)}\\\\
+	\mathrm{s.t.}\\quad			& ${2:g(x)} \leq 0\\\\
+													& ${3:h(x)} = 0\\\\
+\end{array}
 endsnippet
 
 context "math()"
@@ -1661,6 +1678,7 @@ snip.rv = symbol_list[(index + 1) % len(symbol_list)]
 endsnippet
 
 
+# https://latex-tutorial.com/arrow-latex/
 context "math()"
 snippet helparrow "help arrow"
 \xleftarrow \xrightarrow \xlongleftrightarrow[ below ]{ above }
