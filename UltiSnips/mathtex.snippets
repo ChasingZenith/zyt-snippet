@@ -203,7 +203,7 @@ def findfirstoperator(line):
 		index = 0
 		depth = 0
 		while index < len(line):
-				if line[index] == '\s':
+				if line[index] == ' ' or line[index] == '\t':
 						index += 1
 						continue
 				elif line[index] in ['{', '(']:
@@ -1691,6 +1691,250 @@ snippet <- "next type of left arrow" w
 \leftarrow
 endsnippet
 
+#### superscrpit after subscript
+# $1^{$2}
+# x_{k+1}kk		->		x_{k+1}^{k}
+# \alpha_{k}kk->		\alpha_{k}^{k}
+# \eta_{k}kk	->		\eta_{k}^{k}
+# x_{k}kk			->		x_{k}^{k}
+# Give wrong match since {2} also turn x_{k}df -> x_{k}^f
+# snippet "(_{.*})([a-wy-zA-QS-Z]){2}" "superscrpit after subscript" irA
+# `!p snip.rv= match.group(1)+"^{"+match.group(2) +"}"`
+# endsnippet
+# snippet "(_\w)([a-wy-zA-QS-Z]){2}" "superscrpit after subscript" irA
+# `!p snip.rv= match.group(1)+"^{"+match.group(2) +"}"`
+# endsnippet
+
+### Operator
+priority 10001
+snippet <= "leq" iA
+\le 
+endsnippet
+
+priority 10001
+snippet >= "ge" iA
+\ge 
+endsnippet
+snippet >. "ge" iA
+\ge 
+endsnippet
+snippet <, "le" iA
+\le 
+endsnippet
+
+snippet sum "sum" w
+\sum_{i=${1:1}}`!p
+if t[2]:
+		snip.rv="^{" if len(t[2]) >1 else "^"
+else:
+		snip.rv=""
+`${2:\infty}`!p snip.rv="}" if len(t[2]) > 1 else ""` ${3:f_i(x)}
+endsnippet
+
+context "math()"
+snippet "\s*pow" "to the power" irA
+^{$1}$0
+endsnippet
+
+# Expand the field of real number
+context "math()"
+snippet RR "real" iA
+\R
+endsnippet
+
+context "not math()"
+snippet RR "real" A
+$\R$ 
+endsnippet
+
+context "math()"
+snippet reals "real" iA
+\R
+endsnippet
+
+# Real vector space
+context "math()"
+snippet "R([dmnp1-9])" "real Rn" irA
+\R^`!p snip.rv=match.group(1)`
+endsnippet
+
+context "not math()"
+snippet "R([dmnp1-9])" "real" irA
+$\R^`!p snip.rv=match.group(1)`\$
+endsnippet
+
+context "math()"
+snippet "\\R\^([mnNd])([mnNd])" "Real Matrix Rmn" wrA
+\R^{`!p snip.rv = match.group(1) + " \\times " + match.group(2)`}
+endsnippet
+
+context "math()"
+snippet "C([mn])" "complex" irA
+\complexs^`!p snip.rv=match.group(1)`
+endsnippet
+
+context "not math()"
+snippet "C([mn])" "complex" irA
+$\complexs^`!p snip.rv=match.group(1)`\$
+endsnippet
+
+context "math()"
+snippet "\\reals([a-z])" "real" riA
+\reals^`!p snip.rv = match.group(1)`
+endsnippet
+
+
+priority 100
+context "math()"
+snippet "([ux-z])([a-z])\2" "ukk xkk -> u^k x^k superscript" riA
+`!p snip.rv=match.group(1) +"_"+match.group(2)[0]`
+endsnippet
+
+priority 101
+context "math()"
+snippet "([xy])([a-z])\2" "ukk xkk -> u^k x^k superscript" riA
+`!p snip.rv=match.group(1) +"_"+match.group(2)[0]`
+endsnippet
+
+# priority 102
+# context "math()"
+# snippet '([ux])(\d)' "auto number superscript for u x u1->u^1" wrA
+# `!p snip.rv = match.group(1)`^`!p snip.rv = match.group(2)`
+# endsnippet
+#
+# priority 103
+# context "math()"
+# snippet '([x])(\d)' "auto number superscript for u x u1->u^1" wrA
+# `!p snip.rv = match.group(1)`^`!p snip.rv = match.group(2)`
+# endsnippet
+
+
+### Linear Algebra
+
+#### transpose
+priority 100
+context "math()"
+snippet '' "^T" iA
+^T
+endsnippet
+
+context "math()"
+snippet ;; "^H Hermitian" iA
+^H
+endsnippet
+
+context "math()"
+snippet 'h "^H Hermitian" iA
+^H
+endsnippet
+
+#### inverse
+context "math()"
+snippet uinv "psudo-inverse" iA
+^\dagger
+endsnippet
+
+context "math()"
+snippet "([a-zA-Z])fuinv" "full column rank left inverse psudo-inverse" rA
+(${1:`!p snip.rv=match.group(1)`}^T $1)^{-1}$1^T 
+endsnippet
+
+context "math()"
+snippet ocompl "othogonal complement" iA
+^{\perp}
+endsnippet
+
+priority 201
+context "math()"
+snippet norm "norm" iA
+\|${1:${VISUAL}}\|$0
+endsnippet
+
+### probability
+context "math()"
+snippet XX "Expectation" iA
+\mathbb{E}
+endsnippet
+
+context "math()"
+snippet cX "conditional Expectation" iA
+\mathbb{E} \left[ $1 \mid $2 \right]$0
+endsnippet
+
+context "math()"
+snippet var "variance" iA
+\operatorname{var}
+endsnippet
+
+
+# convex analysis
+context "math()"
+snippet dom "dom" iA
+\dom 
+endsnippet
+
+context "math()"
+snippet aff "aff" iA
+\aff
+endsnippet
+
+context "math()"
+snippet rank "rank" iA
+\rank
+endsnippet
+
+## Optimization
+context "math()"
+snippet prox "prox" iA
+\prox
+endsnippet
+
+
+
+
+
+
+### Frormat
+
+#### Font family
+context "math()"
+snippet mcal "mathcal" iA
+\mathcal{$1}$0
+endsnippet
+
+
+#### boldface
+priority 100
+context "math()"
+snippet "([a-zA-Z])_([a-zA-Z\d]),\." "vector,. support subscript" riA
+\mathbf{`!p snip.rv=match.group(1)`}_`!p snip.rv=match.group(2)`
+endsnippet
+
+priority 90
+context "math()"
+snippet "([a-zA-Z1]),\." "vector,." riA
+\mathbf{`!p snip.rv=match.group(1)`}
+endsnippet
+
+priority 100
+context "math()"
+snippet "([a-gi-zA-Z])bf" "vectorbf" riA
+\mathbf{`!p snip.rv=match.group(1)`}
+endsnippet
+
+#### Color
+
+context "math()"
+snippet colorred "textcolor{red}" 
+\mathcolor{red}{${1:${VISUAL}}} $0
+endsnippet
+
+
+priority 300
+context "math()"
+snippet '(red|blue|green|gray|purple|yellow)tt' "redtt \textcolor{color}{text}" rwA
+\\mathcolor{`!p snip.rv = match.group(1)`}{${1:${VISUAL}}}
+endsnippet
 
 # as for \xleftarrow, see 4.9 Extensible arrows in doc of amsmath
 context "math()"
