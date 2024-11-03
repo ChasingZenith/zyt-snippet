@@ -410,12 +410,22 @@ endsnippet
 ### Fraction
 context "math()"
 snippet // "Fraction" iA
-\\frac{${1:${VISUAL}}}{$2}$0
+\\`!p
+if t[2]:
+	snip.rv = ""
+else:
+	snip.rv = "s"
+`frac{${2:${VISUAL}}}{$1}
 endsnippet
 
 context "math()"
 snippet / "Fraction" i
-\\frac{${VISUAL}}{$1}$0
+\\`!p
+if t[2]:
+	snip.rv = ""
+else:
+	snip.rv = "s"
+`frac{${2:${VISUAL}}}{$1}
 endsnippet
 
 priority 100
@@ -711,7 +721,7 @@ snippet lrB "left[ right]" iA
 endsnippet
 
 snippet lra "leftangle rightangle" iA
-\left\langle ${1:${VISUAL}} , ${2}\right\rangle
+\left< ${1:${VISUAL}} \right> 
 endsnippet
 
 context "math()"
@@ -953,7 +963,7 @@ endsnippet
 priority 100
 context "math()"
 ### Backreference is an expression \n where n is a number. It matches the contents of the n'th set of parentheses in the expression.
-snippet "([b-hjtuvwxyz])([a-z])\2" "akk -> a_k subscript" riA
+snippet "([A-Zb-hjpqt-z])([a-z])\2" "xkk -> x_k subscript" riA
 `!p snip.rv=match.group(1) + "_" + match.group(2)[0]`
 endsnippet
 
@@ -993,7 +1003,7 @@ endsnippet
 priority 2000
 context "math()"
 snippet "(?!=^\\)([a-zA-Z])([a-zA-Z])p(\d)" "x[n+1]" rA
-`!p snip.rv=match.group(1)`^{`!p snip.rv=match.group(2)`+`!p snip.rv=match.group(3)`}
+`!p snip.rv=match.group(1)`_{`!p snip.rv=match.group(2)`+`!p snip.rv=match.group(3)`}
 endsnippet
 
 context "math()"
@@ -1059,23 +1069,11 @@ endsnippet
 
 context "math()"
 snippet opt "optimal value - supersucript star" iA
-^{\star}
+_{\star}
 endsnippet
 context "math()"
 snippet dual "conjugate dual" iA
 ^{*}
-endsnippet
-
-# priority 100
-# context "math()"
-# snippet "([fVvQqxy])opt" "optimal value" riA
-# `!p snip.rv=match.group(1)`^*
-# endsnippet
-
-priority 200
-context "math()"
-snippet norm "norm" iA
-\|${1:${VISUAL}}\|_{2}$0
 endsnippet
 
 context "not math()"
@@ -1739,33 +1737,33 @@ endsnippet
 # Expand the field of real number
 context "math()"
 snippet RR "real" iA
-\R
+\mathbb{R}
 endsnippet
 
 context "not math()"
 snippet RR "real" A
-$\R$ 
+$\mathbb{R}$ 
 endsnippet
 
 context "math()"
 snippet reals "real" iA
-\R
+\mathbb{R}
 endsnippet
 
 # Real vector space
 context "math()"
 snippet "R([dmnp1-9])" "real Rn" irA
-\R^`!p snip.rv=match.group(1)`
+\mathbb{R}^`!p snip.rv=match.group(1)`
 endsnippet
 
 context "not math()"
 snippet "R([dmnp1-9])" "real" irA
-$\R^`!p snip.rv=match.group(1)`\$
+$\\mathbb{R}^`!p snip.rv=match.group(1)`\$
 endsnippet
 
 context "math()"
-snippet "\\R\^([mnNd])([mnNd])" "Real Matrix Rmn" wrA
-\R^{`!p snip.rv = match.group(1) + " \\times " + match.group(2)`}
+snippet "\\mathbb{R}\^([mnNd])([mnNd])" "Real Matrix Rmn" wrA
+\\mathbb{R}^{`!p snip.rv = match.group(1) + " \\times " + match.group(2)`}
 endsnippet
 
 context "math()"
@@ -1782,32 +1780,6 @@ context "math()"
 snippet "\\reals([a-z])" "real" riA
 \reals^`!p snip.rv = match.group(1)`
 endsnippet
-
-
-priority 100
-context "math()"
-snippet "([ux-z])([a-z])\2" "ukk xkk -> u^k x^k superscript" riA
-`!p snip.rv=match.group(1) +"_"+match.group(2)[0]`
-endsnippet
-
-priority 101
-context "math()"
-snippet "([xy])([a-z])\2" "ukk xkk -> u^k x^k superscript" riA
-`!p snip.rv=match.group(1) +"_"+match.group(2)[0]`
-endsnippet
-
-# priority 102
-# context "math()"
-# snippet '([ux])(\d)' "auto number superscript for u x u1->u^1" wrA
-# `!p snip.rv = match.group(1)`^`!p snip.rv = match.group(2)`
-# endsnippet
-#
-# priority 103
-# context "math()"
-# snippet '([x])(\d)' "auto number superscript for u x u1->u^1" wrA
-# `!p snip.rv = match.group(1)`^`!p snip.rv = match.group(2)`
-# endsnippet
-
 
 ### Linear Algebra
 
@@ -1847,7 +1819,7 @@ endsnippet
 priority 201
 context "math()"
 snippet norm "norm" iA
-\|${1:${VISUAL}}\|$0
+\lVert ${1:${VISUAL}}\rVert 
 endsnippet
 
 ### probability
@@ -2064,7 +2036,21 @@ snip.rv='$'+match.group(1)+'$'+match.group(2)`
 endsnippet
 
 context "not math()"
-snippet "(?<=\s)(\w\s*[-_+=><]\s*\w)([,.\)]?)\s+" "surround i+1" rA
+snippet "(?<=\s)(\w\s*[=><])" "f_ f= f> f< " rA
+$`!p snip.rv=match.group(1)`${1}$
+endsnippet
+
+context "not math()"
+snippet "(?<=\s)(\w\s*[-+=><]\s*\w)([,.\)]?)\s+" "surround i+1" rA
+`!p
+# match.group(1) for the alphebet and the number
+# match.group(2) for a possible comma or period or )
+# when there is no ',' or '.' , match.group(2) = ''
+snip.rv='$'+match.group(1)+'$'+match.group(2)`
+endsnippet
+
+context "not math()"
+snippet "(?<=\s)(\w\s*'+\s*)([,.\)]?)\s+" "surround y'" rA
 `!p
 # match.group(1) for the alphebet and the number
 # match.group(2) for a possible comma or period or )

@@ -369,6 +369,17 @@ snippet lualatex "tex program" bi
 %!TeX program = lualatex
 endsnippet
 
+
+
+# \usepackage{mathtools}
+# \DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+# priority 202
+# context "math()"
+# snippet norm "norm" iA
+# \norm*{${1:${VISUAL}}}
+# endsnippet
+
+
 snippet table "Table environment" b
 \begin{table}[${1:htpb}]
 	\centering
