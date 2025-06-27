@@ -16,8 +16,10 @@ RightArrows = r"\rightarrow|\longrightarrow|\Rightarrow|\Longrightarrow|\xrighta
 LeftrightArrows = ["\\" + x for x in "leftrightarrow|longleftrightarrow|Leftrightarrow|Longleftrightarrow|iff".split("|")]
 
 import re
+import subprocess
 
 from snippet_helpers import last_p1_not_p2, first_p1_not_p2
+from fcitx5_helpers import fcitx5_record_and_inactivate, fcitx5_retain_im
 
 # def math():
 # 	# return vim.eval('mode#in_mathzone()') == '1'
@@ -330,12 +332,16 @@ def complete(input_str, candidate):
 endglobal
 
 
+pre_expand fcitx5_record_and_inactivate()
+post_jump "if snip.tabstop == 0: fcitx5_retain_im()"
 snippet beg "begin{} / end{}" bA
 \\begin{$1}
 	$0
 \\end{$1}
 endsnippet
 
+pre_expand fcitx5_record_and_inactivate()
+post_jump "if snip.tabstop == 0: fcitx5_retain_im()"
 snippet "\s*mk" "Math" wrA
 `!p
 if not snip.c:
@@ -353,9 +359,10 @@ if not snip.c:
 		snip.rv += "$$"
 	else:
 		snip.rv += "$"
-`$0
+`
 endsnippet
 
+pre_expand fcitx5_record_and_inactivate()
 context "math()"
 snippet ali "Align" bA
 \begin{aligned}
@@ -368,6 +375,8 @@ for (i, x) in enumerate(selectedcode):
 \end{aligned}
 endsnippet
 
+pre_expand fcitx5_record_and_inactivate()
+post_jump "if snip.tabstop == 0: fcitx5_retain_im()"
 snippet bali "Align with {" bA
 \[
 \left\{
@@ -762,8 +771,8 @@ snippet diff "d/dx" w
 endsnippet
 
 context "math()"
-snippet "(?<![\\a-zA-Z])sq" "\sqrt{}" iA
-\sqrt{${1:${VISUAL}}} $0
+snippet "(?<![\\a-zA-Z])sq" "\sqrt{}" irA
+\\sqrt{${1:${VISUAL}}}
 endsnippet
 
 context "math()"
@@ -773,7 +782,7 @@ endsnippet
 
 context "math()"
 snippet "(?<=([\w}\)\]]))tp" "transpose" irA
-^\top
+^T
 endsnippet
 
 context "math()"
@@ -963,7 +972,7 @@ endsnippet
 priority 100
 context "math()"
 ### Backreference is an expression \n where n is a number. It matches the contents of the n'th set of parentheses in the expression.
-snippet "([A-Zb-hjpqt-z])([a-z])\2" "xkk -> x_k subscript" riA
+snippet "([A-Zb-hjpqrt-z])([a-z])\2" "xkk -> x_k subscript" riA
 `!p snip.rv=match.group(1) + "_" + match.group(2)[0]`
 endsnippet
 
@@ -971,44 +980,38 @@ endsnippet
 priority 100
 context "math()"
 ### Backreference is an expression \n where n is a number. It matches the contents of the n'th set of parentheses in the expression.
-snippet "a([a-qs-z])\1" "akk -> a_k subscript" riA
+# exclude gamma
+snippet "(?<!g)a([a-qs-z])\1" "akk -> a_k subscript" riA
 `!p snip.rv= "a" + "_" + match.group(1)[0]`
 endsnippet
 context "math()"
 snippet "([^t])arr" "akk -> a_k subscript" rwA
 `!p snip.rv=match.group(1) + "a" +"_" + "r"`
 endsnippet
+context "math()"
+snippet "(?<!ga)mm" "xmm -> x_m subscript" rwA
+_m
+endsnippet
+# exclude gamma END
 # exclude \leftarrow \rightarrow END
 
 priority 101
 context "math()"
-snippet "(\d[a-zA-Z]|\\mu|\\alpha|\\sigma|\\rho|\\beta|\\gamma|\\delta|\\zeta|\\eta|\\varepsilon|\\theta|\\iota|\\kappa|\\vartheta|\\lambda|\\nu|\\pi|\\rho|\\tau|\\upsilon|\\phi|\\chi|\\psi|\\omega|\\Gamma|\\Delta|\\Theta|\\Lambda|\\Xi|\\Pi|\\Sigma|\\Upsilon|\\Phi|\\Psi|\\Omega)ii" "?i" riA
-`!p snip.rv=match.group(1)`_{i}
-endsnippet
-
-priority 100
-context "math()"
-snippet "(\d[a-zA-Z]|\\mu|\\alpha|\\sigma|\\rho|\\beta|\\gamma|\\delta|\\zeta|\\eta|\\varepsilon|\\theta|\\iota|\\kappa|\\vartheta|\\lambda|\\nu|\\pi|\\rho|\\tau|\\upsilon|\\phi|\\chi|\\psi|\\omega|\\Gamma|\\Delta|\\Theta|\\Lambda|\\Xi|\\Pi|\\Sigma|\\Upsilon|\\Phi|\\Psi|\\Omega)jj" "?j" riA
-`!p snip.rv=match.group(1)`_{j}
-endsnippet
-
-priority 101
-context "math()"
-snippet "(\d[a-zA-Z]|\\mu|\\alpha|\\sigma|\\rho|\\beta|\\gamma|\\delta|\\zeta|\\eta|\\varepsilon|\\theta|\\iota|\\kappa|\\vartheta|\\lambda|\\nu|\\pi|\\rho|\\tau|\\upsilon|\\phi|\\chi|\\psi|\\omega|\\Gamma|\\Delta|\\Theta|\\Lambda|\\Xi|\\Pi|\\Sigma|\\Upsilon|\\Phi|\\Psi|\\Omega)nn" "?i" riA
-`!p snip.rv=match.group(1)`_{n}
+snippet "(\\alpha|\\sigma|\\rho|\\beta|\\gamma|\\delta|\\zeta|\\eta|\\epsilon|\\varepsilon|\\theta|\\iota|\\kappa|\\vartheta|\\lambda|\\mu|\\nu|\\pi|\\rho|\\tau|\\upsilon|\\phi|\\chi|\\psi|\\omega|\\Gamma|\\Delta|\\Theta|\\Lambda|\\Xi|\\Pi|\\Sigma|\\Upsilon|\\Phi|\\Psi|\\Omega)([Ka-z\d])\2" "subscript for greek letter" riA
+`!p snip.rv=match.group(1) + "_" + match.group(2)`
 endsnippet
 
 
 # xup3  -> x_{u+3}
 priority 2000
 context "math()"
-snippet "(?!=^\\)([a-zA-Z])([a-zA-Z])p(\d)" "x[n+1]" rA
-`!p snip.rv=match.group(1)`_{`!p snip.rv=match.group(2)`+`!p snip.rv=match.group(3)`}
+snippet "(?!=^\\)([a-zA-Z])([a-zA-Z])p(\d)" "xkp1 -> x_{k+1}" rA
+`!p snip.rv=match.group(1) + "_{" + match.group(2) + "+" + match.group(3) + "}"`
 endsnippet
 
 context "math()"
-snippet xmm "x" iA
-x_{m}
+snippet fxk "f(x_k)" iA
+f(x_k)
 endsnippet
 
 snippet R0+ "R0+" iA
@@ -1432,7 +1435,7 @@ endsnippet
 # \alphadot -> \dot{\alpha}
 priority 100
 context "math()"
-snippet "(\\?[a-zA-Z]\w*)dot" "dot" riA
+snippet "(\\?[abe-uw-zA-Z]\w*)dot" "dot" riA
 \dot{`!p snip.rv=match.group(1)`}
 endsnippet
 
@@ -1550,8 +1553,9 @@ snippet opn "operatorname" A
 \operatorname{${1:${VISUAL}}}
 endsnippet
 
+# \S will include $
 context "math()"
-snippet "(\S*)opn" "operatorname" iwAr
+snippet "(\w*)opn" "operatorname" iwAr
 \operatorname{`!p snip.rv = match.group(1)`}
 endsnippet
 
@@ -1563,8 +1567,14 @@ endsnippet
 
 priority 200
 context "math()"
-snippet "(?<![\\a-zA-Z])(mu|alpha|sigma|rho|beta|gamma|delta|zeta|eta|varepsilon|theta|iota|kappa|vartheta|lambda|nu|pi|rho|tau|upsilon|phi|chi|psi|omega|Gamma|Delta|Theta|Lambda|Xi|Pi|Sigma|Upsilon|Phi|Psi|Omega)" "greek" wrA
+snippet "(?<!\\)(mu|alpha|sigma|rho|beta|gamma|delta|zeta|eta|varepsilon|theta|iota|kappa|vartheta|lambda|nu|pi|rho|tau|upsilon|varphi|phi|chi|psi|omega|Gamma|Delta|Theta|Lambda|Xi|Pi|Sigma|Upsilon|Phi|Psi|Omega)" "greek" wrA
 \\`!p snip.rv = match.group(1)`
+endsnippet
+
+priority 200
+context "math()"
+snippet "(?<=\\)(phi)" "var greek" wr
+var`!p snip.rv = match.group(1)`
 endsnippet
 
 # See https://tex.stackexchange.com/questions/37789/using-colon-or-in-formulas
@@ -1660,6 +1670,14 @@ snippet "\\right\)([\^_]){\\mathclap (\w)}" "revert mathclap supersubscript for 
 `!p snip.rv=r"\right)"+match.group(1)+match.group(2)`
 endsnippet
 
+context "math()"
+snippet "(\\max|\\min|\\sum|\\prod)([\^_]){([\w\\{} \(\)<>\[\]\-\+\/,]+)}" "revert mathclap supersubscript for better spacing" wr
+`!p snip.rv=r"\smashoperator[r]{"+match.group(1)+match.group(2)+"{"+match.group(3)+"}"+"}"`
+endsnippet
+context "math()"
+snippet "\\smashoperator\[?\w?\]?{(\\max|\\min|\\sum|\\prod)([\^_]){([\w\\{} \(\)<>\[\]\-\+\/,]+)}}" "revert mathclap supersubscript for better spacing" wr
+`!p snip.rv=match.group(1)+match.group(2)+"{"+match.group(3)+"}"`
+endsnippet
 
 # Space in latex
 # See https://www.overleaf.com/learn/latex/Spacing_in_math_mode#Reference_guide
@@ -1819,7 +1837,7 @@ endsnippet
 priority 201
 context "math()"
 snippet norm "norm" iA
-\lVert ${1:${VISUAL}}\rVert 
+\|${1:${VISUAL}}\|
 endsnippet
 
 ### probability
@@ -1833,10 +1851,11 @@ snippet cX "conditional Expectation" iA
 \mathbb{E} \left[ $1 \mid $2 \right]$0
 endsnippet
 
-context "math()"
-snippet var "variance" iA
-\operatorname{var}
-endsnippet
+# conflict with \varphi and so on
+#context "math()"
+#snippet var "variance" iA
+#\operatorname{var}
+#endsnippet
 
 
 # convex analysis

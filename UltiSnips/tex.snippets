@@ -1,6 +1,7 @@
 global !p
 
 import re
+from fcitx5_helpers import fcitx5_record_and_inactivate, fcitx5_retain_im
 
 
 # def math():
@@ -430,10 +431,14 @@ endsnippet
 
 
 priority 1
+pre_expand fcitx5_record_and_inactivate()
+post_jump "if snip.tabstop == 0: fcitx5_retain_im()"
 snippet dm "Math" bA
 \[ ${1:${VISUAL}} \]
 endsnippet
 priority 0
+pre_expand fcitx5_record_and_inactivate()
+post_jump "if snip.tabstop == 0: fcitx5_retain_im()"
 snippet dm "Math" wAm
 
 \[ ${1:${VISUAL}} \]
@@ -476,6 +481,7 @@ snippet plotfunc "Plot function using pgfplots" b
 \begin{figure}[htpb]
   \centering
   % use pgfplot to plot a function
+	% \tikzsetnextfilename{filename}
   \begin{tikzpicture}
     \tikzstyle{every node}=[font=\footnotesize]
     \pgfplotsset{

@@ -3,6 +3,7 @@ global !p
 
 import re
 from snippet_helpers import last_p1_not_p2, first_p1_not_p2
+from fcitx5_helpers import fcitx5_record_and_inactivate, fcitx5_retain_im
 
 def back_parentheses():
 	right = vim.eval("getline('.')[col('.')-1:]")
@@ -167,6 +168,8 @@ snippet zhihumk "Math" wA
 endsnippet
 
 context "not math()"
+pre_expand fcitx5_record_and_inactivate()
+post_jump "if snip.tabstop == 0: fcitx5_retain_im()"
 snippet dm "Math" wA
 $$
 ${1:${VISUAL}}
