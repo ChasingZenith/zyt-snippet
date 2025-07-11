@@ -427,19 +427,9 @@ else:
 `frac{${2:${VISUAL}}}{$1}
 endsnippet
 
-context "math()"
-snippet / "Fraction" i
-\\`!p
-if t[2]:
-	snip.rv = ""
-else:
-	snip.rv = "s"
-`frac{${2:${VISUAL}}}{$1}
-endsnippet
-
 priority 100
 context "math()"
-snippet '((\d+)|(\d*)(\\)?([A-Za-z]+)((\^|_)(\{\d+\}|\d))*)/' "symbol frac" wrA
+snippet '((\d+)|(\d*)(\\)?([A-Za-z]+)((\^|_)(\{\w+\}|\w))*)/' "symbol frac" wrA
 \\frac{`!p snip.rv = match.group(1)`}{$1}$0
 endsnippet
 
@@ -1010,8 +1000,8 @@ snippet "(?!=^\\)([a-zA-Z])([a-zA-Z])p(\d)" "xkp1 -> x_{k+1}" rA
 endsnippet
 
 context "math()"
-snippet fxk "f(x_k)" iA
-f(x_k)
+snippet "(?!=\w)fx(\w)" "f(x_k)" irA
+f(x_`!p snip.rv=match.group(1)`)
 endsnippet
 
 snippet R0+ "R0+" iA
@@ -1671,11 +1661,11 @@ snippet "\\right\)([\^_]){\\mathclap (\w)}" "revert mathclap supersubscript for 
 endsnippet
 
 context "math()"
-snippet "(\\max|\\min|\\sum|\\prod)([\^_]){([\w\\{} \(\)<>\[\]\-\+\/,]+)}" "revert mathclap supersubscript for better spacing" wr
+snippet "(\\max|\\min|\\sum|\\prod)([\^_]){([\w\\{} \(\)<>\[\]\-\+\/=,]+)}" "revert mathclap supersubscript for better spacing" wr
 `!p snip.rv=r"\smashoperator[r]{"+match.group(1)+match.group(2)+"{"+match.group(3)+"}"+"}"`
 endsnippet
 context "math()"
-snippet "\\smashoperator\[?\w?\]?{(\\max|\\min|\\sum|\\prod)([\^_]){([\w\\{} \(\)<>\[\]\-\+\/,]+)}}" "revert mathclap supersubscript for better spacing" wr
+snippet "\\smashoperator\[?\w?\]?{(\\max|\\min|\\sum|\\prod)([\^_]){([\w\\{} \(\)<>\[\]\-\+\/=,]+)}}" "revert mathclap supersubscript for better spacing" wr
 `!p snip.rv=match.group(1)+match.group(2)+"{"+match.group(3)+"}"`
 endsnippet
 
